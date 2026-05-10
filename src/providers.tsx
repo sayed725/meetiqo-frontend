@@ -5,6 +5,28 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { ThemeProvider } from 'next-themes';
 import { useState } from 'react';
 
+import { useAuthStore } from '@/lib/auth-store';
+import api from '@/lib/api';
+import { useEffect } from 'react';
+
+function AuthSync() {
+  const { token, setAuth, logout } = useAuthStore();
+
+  useEffect(() => {
+    if (token) {
+      api.get('/auth/me')
+        .then((res) => {
+          setAuth(res.data.data, token);
+        })
+        .catch(() => {
+          logout();
+        });
+    }
+  }, [token, setAuth, logout]);
+
+  return null;
+}
+
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
     () =>
@@ -28,6 +50,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <AuthSync />
         {children}
       </ThemeProvider>
       <ReactQueryDevtools initialIsOpen={false} />

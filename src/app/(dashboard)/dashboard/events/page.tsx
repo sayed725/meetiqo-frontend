@@ -131,7 +131,7 @@ export default function MyEventsPage() {
   const { data: events, isLoading } = useQuery<DashboardEvent[]>({
     queryKey: ['my-events', activeTab],
     queryFn: async () => {
-      const res = await api.get(`/events?status=${activeTab}`);
+      const res = await api.get(`/events/me/all?status=${activeTab}`);
       return res.data.data?.events || [];
     },
   });
@@ -149,7 +149,21 @@ export default function MyEventsPage() {
   });
 
   const onSubmit = (data: EventFormData) => {
-    createMutation.mutate(data);
+    const payload = { ...data };
+    if (!payload.bannerImage) delete payload.bannerImage;
+    if (!payload.address) delete payload.address;
+    if (!payload.endDate) delete payload.endDate;
+    if (!payload.maxParticipants) delete payload.maxParticipants;
+    
+    // Ensure startDate is a valid ISO string if it's from a datetime-local input
+    if (payload.startDate) {
+      payload.startDate = new Date(payload.startDate).toISOString();
+    }
+    if (payload.endDate) {
+      payload.endDate = new Date(payload.endDate).toISOString();
+    }
+
+    createMutation.mutate(payload);
   };
 
   const revenue = (event: DashboardEvent) => {

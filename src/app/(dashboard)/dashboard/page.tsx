@@ -101,7 +101,7 @@ function OrganizerView() {
   const { data: stats } = useQuery<DashboardStats>({
     queryKey: queryKeys.dashboard.stats,
     queryFn: async () => {
-      const res = await api.get('/dashboard/stats');
+      const res = await api.get('/analytics/stats');
       return res.data.data;
     },
   });
@@ -347,7 +347,7 @@ function UserView() {
 
   const acceptMutation = useMutation({
     mutationFn: async (id: string) => {
-      const res = await api.put(`/invitations/${id}/accept`);
+      const res = await api.patch(`/invitations/${id}/respond`, { status: 'ACCEPTED' });
       return res.data;
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['my-invitations'] }),
@@ -355,7 +355,7 @@ function UserView() {
 
   const declineMutation = useMutation({
     mutationFn: async (id: string) => {
-      const res = await api.put(`/invitations/${id}/decline`);
+      const res = await api.patch(`/invitations/${id}/respond`, { status: 'DECLINED' });
       return res.data;
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['my-invitations'] }),

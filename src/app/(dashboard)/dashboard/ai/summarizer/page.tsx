@@ -57,7 +57,7 @@ export default function ReviewSummarizerPage() {
   const { data: myEvents } = useQuery<UserEvent[]>({
     queryKey: queryKeys.events.myEvents,
     queryFn: async () => {
-      const res = await api.get('/events/my-events');
+      const res = await api.get('/events/me/all');
       return res.data.data?.events || [];
     },
     enabled: user?.role === 'ORGANIZER' || user?.role === 'ADMIN',

@@ -103,20 +103,14 @@ export default function RegisterPage() {
   const handleRegister = async (data: RegisterInput) => {
     setIsLoading(true);
     try {
-      await api.post('/auth/register', {
+      const res = await api.post('/auth/register', {
         name: data.name,
         email: data.email,
         password: data.password,
         role: data.role,
       });
 
-      // Auto-login after registration
-      const loginRes = await api.post('/auth/login', {
-        email: data.email,
-        password: data.password,
-      });
-
-      const { user, token } = loginRes.data.data;
+      const { user, token } = res.data.data;
       setAuth(user, token);
       document.cookie = `token=${token}; path=/; max-age=604800; sameSite=lax`;
       localStorage.setItem('token', token);
