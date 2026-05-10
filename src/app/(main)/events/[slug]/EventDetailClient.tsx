@@ -83,6 +83,10 @@ export default function EventDetailClient({ event }: EventDetailClientProps) {
     },
     enabled: !!event.id,
     staleTime: 60_000,
+    retry: (failureCount, error: any) => {
+      if (error?.response?.status === 404) return false;
+      return failureCount < 1;
+    },
   });
 
   const { data: participantsData } = useQuery({
@@ -91,8 +95,12 @@ export default function EventDetailClient({ event }: EventDetailClientProps) {
       const res = await api.get(`/events/${event.id}/participants`);
       return res.data.data;
     },
-    enabled: !!event.id && (event.type === 'PUBLIC' || isParticipant || isOrganizer),
+    enabled: isAuthenticated && !!event.id && (event.type === 'PUBLIC' || isParticipant || isOrganizer),
     staleTime: 60_000,
+    retry: (failureCount, error: any) => {
+      if (error?.response?.status === 403 || error?.response?.status === 404) return false;
+      return failureCount < 1;
+    },
   });
 
   const { data: aiInsights, isLoading: aiLoading } = useQuery({
@@ -101,8 +109,12 @@ export default function EventDetailClient({ event }: EventDetailClientProps) {
       const res = await api.get(`/ai/event-insights/${event.id}`);
       return res.data.data;
     },
-    enabled: !!event.id,
+    enabled: isAuthenticated && !!event.id,
     staleTime: 300_000,
+    retry: (failureCount, error: any) => {
+      if (error?.response?.status === 404) return false;
+      return failureCount < 1;
+    },
   });
 
   const submitReview = useMutation({

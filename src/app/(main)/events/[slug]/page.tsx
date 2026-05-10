@@ -9,7 +9,7 @@ interface Props {
 export async function generateStaticParams() {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/events?limit=20`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/events?limit=20`,
       { next: { revalidate: 3600 } }
     );
     if (!res.ok) return [];
@@ -23,10 +23,11 @@ export async function generateStaticParams() {
 
 async function fetchEvent(slug: string) {
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/events/${slug}`,
+    `${process.env.NEXT_PUBLIC_API_URL}/api/events/${slug}`,
     { next: { revalidate: 60 } }
   );
-  if (!res.ok) return null;
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`API error ${res.status}`);
   const json = await res.json();
   return json.data;
 }

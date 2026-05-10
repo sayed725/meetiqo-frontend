@@ -31,8 +31,11 @@ const navItems = [
   { label: 'Analytics', href: '/dashboard/analytics', icon: BarChart2, roles: ['ORGANIZER', 'ADMIN'] },
   { label: 'Profile', href: '/dashboard/profile', icon: User, roles: ['USER', 'ORGANIZER', 'ADMIN'] },
   { label: 'Settings', href: '/dashboard/settings', icon: Settings, roles: ['USER', 'ORGANIZER', 'ADMIN'] },
-  { label: 'Users', href: '/dashboard/users', icon: Users, roles: ['ADMIN'] },
-  { label: 'Reports', href: '/dashboard/reports', icon: Flag, roles: ['ADMIN'] },
+  { label: 'Admin Panel', href: '/dashboard/admin', icon: LayoutDashboard, roles: ['ADMIN'] },
+  { label: 'Admin Events', href: '/dashboard/admin/events', icon: CalendarDays, roles: ['ADMIN'] },
+  { label: 'Admin Users', href: '/dashboard/admin/users', icon: Users, roles: ['ADMIN'] },
+  { label: 'AI Usage', href: '/dashboard/admin/ai-usage', icon: Sparkles, roles: ['ADMIN'] },
+  { label: 'Reports', href: '/dashboard/admin/reports', icon: Flag, roles: ['ADMIN'] },
 ];
 
 export default function Sidebar() {
@@ -76,10 +79,10 @@ export default function Sidebar() {
       >
         <div className="flex h-full flex-col">
           {/* Logo */}
-          <div className="flex h-16 items-center gap-2 border-b px-6">
+          <Link href="/" className="flex h-16 items-center gap-2 border-b px-6 hover:opacity-80 transition-opacity">
             <Logo className="h-6 w-6 text-purple-600" />
             <span className="text-xl font-bold">Meetiqo</span>
-          </div>
+          </Link>
 
           {/* Nav items */}
           <nav className="flex-1 space-y-1 p-4">

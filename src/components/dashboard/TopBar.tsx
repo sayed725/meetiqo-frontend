@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { Bell, User, Settings, LogOut, ChevronDown } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -22,11 +23,27 @@ interface TopBarProps {
 }
 
 export default function TopBar({ title }: TopBarProps) {
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [userOpen, setUserOpen] = useState(false);
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
   const notifications = useNotificationsStore((s) => s.notifications);
   const unreadCount = useNotificationsStore((s) => s.unreadCount);
   const { handleMarkRead, handleMarkAllRead } = useNotifications();
+
+  useEffect(() => {
+    if (notifOpen || userOpen) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.paddingRight = `${window.innerWidth - document.documentElement.clientWidth}px`;
+    } else {
+      document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
+    };
+  }, [notifOpen, userOpen]);
 
   const handleLogout = () => {
     logout();
@@ -41,7 +58,7 @@ export default function TopBar({ title }: TopBarProps) {
       {/* Right side */}
       <div className="flex items-center gap-4">
         {/* Notifications */}
-        <DropdownMenu>
+        <DropdownMenu onOpenChange={setNotifOpen}>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="relative">
               <Bell className="h-5 w-5" />
@@ -95,7 +112,7 @@ export default function TopBar({ title }: TopBarProps) {
         </DropdownMenu>
 
         {/* User menu */}
-        <DropdownMenu>
+        <DropdownMenu onOpenChange={setUserOpen}>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="gap-2">
               <Avatar className="h-8 w-8">

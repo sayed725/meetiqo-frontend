@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import Link from 'next/link';
 import {
   Eye,
   Globe,
@@ -194,8 +195,10 @@ export default function EventModerationPage() {
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-1">
-                    <Button variant="ghost" size="icon" title="View">
-                      <Eye className="h-4 w-4" />
+                    <Button variant="ghost" size="icon" title="View" asChild>
+                      <Link href={`/events/${event.slug}`}>
+                        <Eye className="h-4 w-4" />
+                      </Link>
                     </Button>
                     {event.status !== 'PUBLISHED' ? (
                       <Button

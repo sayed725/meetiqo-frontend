@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import Link from 'next/link';
 import {
   Search,
   Ban,
@@ -212,8 +213,10 @@ export default function UserManagementPage() {
                 <TableCell>{new Date(user.createdAt).toLocaleDateString()}</TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-1">
-                    <Button variant="ghost" size="icon" title="View Profile">
-                      <Eye className="h-4 w-4" />
+                    <Button variant="ghost" size="icon" title="View Profile" asChild>
+                      <Link href={`/dashboard/users/${user.id}`}>
+                        <Eye className="h-4 w-4" />
+                      </Link>
                     </Button>
                     <Button
                       variant="ghost"
