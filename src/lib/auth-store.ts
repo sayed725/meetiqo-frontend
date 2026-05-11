@@ -7,6 +7,7 @@ interface User {
   name: string;
   avatar: string | null;
   role: string;
+  updatedAt: string;
 }
 
 interface AuthState {
@@ -14,6 +15,7 @@ interface AuthState {
   token: string | null;
   isAuthenticated: boolean;
   setAuth: (user: User, token: string) => void;
+  updateUser: (user: User) => void;
   clearAuth: () => void;
   logout: () => void;
 }
@@ -26,6 +28,8 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
       setAuth: (user, token) =>
         set({ user, token, isAuthenticated: true }),
+      updateUser: (user) => 
+        set({ user }),
       clearAuth: () =>
         set({ user: null, token: null, isAuthenticated: false }),
       logout: () => {

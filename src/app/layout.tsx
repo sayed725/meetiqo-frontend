@@ -42,6 +42,8 @@ export const viewport: Viewport = {
   ],
 };
 
+import { Toaster } from 'sonner';
+
 export default function RootLayout({
   children,
 }: {
@@ -51,6 +53,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning className={GeistSans.variable}>
       <body className={`${GeistSans.className} ${GeistMono.variable} antialiased`}>
         <Providers>{children}</Providers>
+        <Toaster position="top-right" richColors />
       </body>
     </html>
   );
