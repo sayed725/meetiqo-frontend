@@ -15,6 +15,7 @@ import {
   ImageIcon,
   Calendar,
   MapPin,
+  Trash2,
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -23,6 +24,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -81,10 +83,16 @@ type EventFormData = z.infer<typeof eventSchema>;
 
 interface DashboardEvent {
   id: string;
+  slug: string;
   title: string;
+  description: string;
   bannerImage: string | null;
   startDate: string;
+  endDate: string | null;
   location: string;
+  address: string | null;
+  latitude: number | null;
+  longitude: number | null;
   status: string;
   type: string;
   category: string;
@@ -106,6 +114,7 @@ const statusColorMap: Record<string, string> = {
 export default function MyEventsPage() {
   const [open, setOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('PUBLISHED');
+  const [editingEventId, setEditingEventId] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
   const {
@@ -136,6 +145,48 @@ export default function MyEventsPage() {
     },
   });
 
+  const handleOpenChange = (isOpen: boolean) => {
+    setOpen(isOpen);
+    if (!isOpen) {
+      setEditingEventId(null);
+      reset({
+        title: '',
+        description: '',
+        bannerImage: '',
+        category: 'OTHER',
+        type: 'PUBLIC',
+        status: 'DRAFT',
+        price: 0,
+        isPaid: false,
+        location: '',
+        address: '',
+        startDate: '',
+        endDate: '',
+        maxParticipants: undefined,
+      });
+    }
+  };
+
+  const handleEdit = (event: DashboardEvent) => {
+    setEditingEventId(event.id);
+    reset({
+      title: event.title,
+      description: event.description || '',
+      bannerImage: event.bannerImage || '',
+      category: event.category,
+      type: event.type as any,
+      status: event.status as any,
+      price: event.price,
+      isPaid: event.isPaid,
+      location: event.location,
+      address: event.address || '',
+      startDate: new Date(event.startDate).toISOString().slice(0, 16),
+      endDate: event.endDate ? new Date(event.endDate).toISOString().slice(0, 16) : '',
+      maxParticipants: event.maxParticipants || undefined,
+    });
+    setOpen(true);
+  };
+
   const createMutation = useMutation({
     mutationFn: async (data: EventFormData) => {
       const res = await api.post('/events', data);
@@ -143,8 +194,28 @@ export default function MyEventsPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['my-events'] });
-      setOpen(false);
-      reset();
+      handleOpenChange(false);
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: EventFormData }) => {
+      const res = await api.put(`/events/${id}`, data);
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['my-events'] });
+      handleOpenChange(false);
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await api.delete(`/events/${id}`);
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['my-events'] });
     },
   });
 
@@ -155,7 +226,6 @@ export default function MyEventsPage() {
     if (!payload.endDate) delete payload.endDate;
     if (!payload.maxParticipants) delete payload.maxParticipants;
     
-    // Ensure startDate is a valid ISO string if it's from a datetime-local input
     if (payload.startDate) {
       payload.startDate = new Date(payload.startDate).toISOString();
     }
@@ -163,7 +233,11 @@ export default function MyEventsPage() {
       payload.endDate = new Date(payload.endDate).toISOString();
     }
 
-    createMutation.mutate(payload);
+    if (editingEventId) {
+      updateMutation.mutate({ id: editingEventId, data: payload });
+    } else {
+      createMutation.mutate(payload);
+    }
   };
 
   const revenue = (event: DashboardEvent) => {
@@ -180,7 +254,7 @@ export default function MyEventsPage() {
             Manage and track all your events.
           </p>
         </div>
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={open} onOpenChange={handleOpenChange}>
           <DialogTrigger asChild>
             <Button>
               <Plus className="mr-2 h-4 w-4" />
@@ -189,7 +263,12 @@ export default function MyEventsPage() {
           </DialogTrigger>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Create New Event</DialogTitle>
+              <DialogTitle>{editingEventId ? 'Edit Event' : 'Create New Event'}</DialogTitle>
+              <DialogDescription>
+                {editingEventId
+                  ? 'Update the details of your event below.'
+                  : 'Fill out the form below to create a new event.'}
+              </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div className="grid gap-4 sm:grid-cols-2">
@@ -355,15 +434,14 @@ export default function MyEventsPage() {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => {
-                    setOpen(false);
-                    reset();
-                  }}
+                  onClick={() => handleOpenChange(false)}
                 >
                   Cancel
                 </Button>
-                <Button type="submit" disabled={createMutation.isPending}>
-                  {createMutation.isPending ? 'Creating...' : 'Create Event'}
+                <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending}>
+                  {createMutation.isPending || updateMutation.isPending
+                    ? (editingEventId ? 'Updating...' : 'Creating...')
+                    : (editingEventId ? 'Update Event' : 'Create Event')}
                 </Button>
               </div>
             </form>
@@ -478,14 +556,12 @@ export default function MyEventsPage() {
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
                             <Button variant="ghost" size="icon" asChild>
-                              <Link href={`/dashboard/events/${event.id}`}>
+                              <Link href={`/events/${event.slug}`}>
                                 <Eye className="h-4 w-4" />
                               </Link>
                             </Button>
-                            <Button variant="ghost" size="icon" asChild>
-                              <Link href={`/dashboard/events/${event.id}/edit`}>
-                                <Edit3 className="h-4 w-4" />
-                              </Link>
+                            <Button variant="ghost" size="icon" onClick={() => handleEdit(event)}>
+                              <Edit3 className="h-4 w-4" />
                             </Button>
                             <Button variant="ghost" size="icon" asChild>
                               <Link
@@ -493,6 +569,19 @@ export default function MyEventsPage() {
                               >
                                 <Users className="h-4 w-4" />
                               </Link>
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="text-destructive hover:bg-destructive/10"
+                              disabled={deleteMutation.isPending}
+                              onClick={() => {
+                                if (confirm('Are you sure you want to delete this event? This action cannot be undone.')) {
+                                  deleteMutation.mutate(event.id);
+                                }
+                              }}
+                            >
+                              <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>
                         </TableCell>

@@ -1,7 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Bell, User, Settings, LogOut, ChevronDown } from 'lucide-react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { Bell, User, Settings, LogOut, ChevronDown, ChevronRight } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -17,6 +19,8 @@ import { Badge } from '@/components/ui/badge';
 import { useAuthStore } from '@/lib/auth-store';
 import { useNotificationsStore } from '@/lib/notifications-store';
 import { useNotifications } from '@/hooks/useNotifications';
+import { SidebarTrigger } from '@/components/ui/sidebar';
+import { ModeToggle } from '@/components/ui/mode-toggle';
 
 interface TopBarProps {
   title?: string;
@@ -30,6 +34,7 @@ export default function TopBar({ title }: TopBarProps) {
   const notifications = useNotificationsStore((s) => s.notifications);
   const unreadCount = useNotificationsStore((s) => s.unreadCount);
   const { handleMarkRead, handleMarkAllRead } = useNotifications();
+  const pathname = usePathname();
 
   useEffect(() => {
     if (notifOpen || userOpen) {
@@ -50,13 +55,45 @@ export default function TopBar({ title }: TopBarProps) {
     window.location.href = '/';
   };
 
+  const pathSegments = pathname.split('/').filter(Boolean);
+
   return (
     <header className="flex h-16 items-center justify-between border-b bg-background px-4 sm:px-6 lg:px-8">
-      {/* Page title */}
-      <h1 className="text-lg font-semibold">{title || 'Dashboard'}</h1>
+      {/* Page title / Breadcrumbs */}
+      <div className="flex items-center gap-2">
+        <SidebarTrigger className="-ml-2 md:hidden" />
+        <div className="hidden sm:flex items-center gap-1 text-sm">
+          {pathSegments.map((segment, index) => {
+            const href = '/' + pathSegments.slice(0, index + 1).join('/');
+            const isLast = index === pathSegments.length - 1;
+            const label = segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, ' ');
+
+            return (
+              <div key={href} className="flex items-center gap-1">
+                {index > 0 && <ChevronRight className="h-4 w-4 text-muted-foreground" />}
+                {isLast ? (
+                  <span className="font-semibold text-foreground">{title || label}</span>
+                ) : (
+                  <Link href={href} className="text-muted-foreground hover:text-foreground transition-colors">
+                    {label}
+                  </Link>
+                )}
+              </div>
+            );
+          })}
+        </div>
+        {/* Mobile title fallback */}
+        <div className="sm:hidden flex items-center">
+          <span className="font-semibold text-foreground">
+            {title || (pathSegments.length > 0 ? pathSegments[pathSegments.length - 1].charAt(0).toUpperCase() + pathSegments[pathSegments.length - 1].slice(1).replace(/-/g, ' ') : 'Dashboard')}
+          </span>
+        </div>
+      </div>
 
       {/* Right side */}
       <div className="flex items-center gap-4">
+        {/* Theme Toggle */}
+        <ModeToggle />
         {/* Notifications */}
         <DropdownMenu onOpenChange={setNotifOpen}>
           <DropdownMenuTrigger asChild>

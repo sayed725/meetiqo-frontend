@@ -51,7 +51,6 @@ export function useNotifications() {
     return () => {
       socket.off('notification');
       socket.off('connect_error');
-      socket.disconnect();
     };
   }, [addNotification, toast, queryClient]);
 

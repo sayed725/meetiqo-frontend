@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -14,14 +13,25 @@ import {
   Users,
   Flag,
   LogOut,
-  Menu,
   Sparkles as Logo,
 } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { useAuthStore } from '@/lib/auth-store';
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarRail,
+  useSidebar,
+} from '@/components/ui/sidebar';
 
 const navItems = [
   { label: 'Overview', href: '/dashboard', icon: LayoutDashboard, roles: ['USER', 'ORGANIZER', 'ADMIN'] },
@@ -38,11 +48,11 @@ const navItems = [
   { label: 'Reports', href: '/dashboard/admin/reports', icon: Flag, roles: ['ADMIN'] },
 ];
 
-export default function Sidebar() {
+export default function AppSidebar() {
   const pathname = usePathname();
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { setOpenMobile } = useSidebar();
 
   const filteredNavItems = navItems.filter((item) =>
     item.roles.includes(user?.role || 'USER')
@@ -54,86 +64,75 @@ export default function Sidebar() {
   };
 
   return (
-    <>
-      {/* Mobile menu button */}
-      <button
-        className="lg:hidden fixed left-4 top-4 z-50 p-2 rounded-lg bg-background border"
-        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-      >
-        <Menu className="h-5 w-5" />
-      </button>
+    <Sidebar>
+      <SidebarHeader className="h-16 border-b flex items-center justify-center px-4">
+        <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity w-full">
+          <Logo className="h-6 w-6 text-purple-600" />
+          <span className="text-xl font-bold">Meetiqo</span>
+        </Link>
+      </SidebarHeader>
 
-      {/* Mobile overlay */}
-      {isMobileMenuOpen && (
-        <div
-          className="lg:hidden fixed inset-0 z-40 bg-background/80 backdrop-blur-sm"
-          onClick={() => setIsMobileMenuOpen(false)}
-        />
-      )}
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {filteredNavItems.map((item) => {
+                const Icon = item.icon;
+                const isRoot = item.href === '/dashboard' || item.href === '/dashboard/admin';
+                const isActive = isRoot 
+                  ? pathname === item.href 
+                  : pathname === item.href || pathname.startsWith(`${item.href}/`);
+                
+                return (
+                  <SidebarMenuItem key={item.href}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={isActive}
+                      onClick={() => setOpenMobile(false)}
+                      tooltip={item.label}
+                      className={isActive ? "!bg-purple-600 !text-white hover:!bg-purple-700 hover:!text-white" : ""}
+                    >
+                      <Link href={item.href}>
+                        <Icon />
+                        <span>{item.label}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
 
-      {/* Sidebar */}
-      <aside
-        className={`fixed left-0 top-0 z-40 h-screen w-64 border-r bg-background transition-transform duration-300 lg:relative lg:translate-x-0 ${
-          isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
-        } lg:translate-x-0`}
-      >
-        <div className="flex h-full flex-col">
-          {/* Logo */}
-          <Link href="/" className="flex h-16 items-center gap-2 border-b px-6 hover:opacity-80 transition-opacity">
-            <Logo className="h-6 w-6 text-purple-600" />
-            <span className="text-xl font-bold">Meetiqo</span>
-          </Link>
-
-          {/* Nav items */}
-          <nav className="flex-1 space-y-1 p-4">
-            {filteredNavItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-                    isActive
-                      ? 'bg-purple-600 text-white'
-                      : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                  }`}
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton size="lg" asChild>
+              <div className="w-full flex items-center gap-2">
+                <Avatar className="h-8 w-8 rounded-lg">
+                  <AvatarImage src={user?.avatar || undefined} />
+                  <AvatarFallback className="rounded-lg bg-purple-100 text-purple-700">
+                    {user?.name?.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-semibold">{user?.name}</span>
+                  <span className="truncate text-xs text-muted-foreground">{user?.role}</span>
+                </div>
+                <button
+                  title="Logout"
+                  className="ml-auto h-8 w-8 shrink-0 flex items-center justify-center rounded-md hover:bg-background text-muted-foreground hover:text-foreground transition-colors"
+                  onClick={handleLogout}
                 >
-                  <Icon className="h-5 w-5 shrink-0" />
-                  <span>{item.label}</span>
-                </Link>
-              );
-            })}
-          </nav>
-
-          {/* Footer */}
-          <div className="border-t p-4">
-            <div className="flex items-center gap-3 rounded-lg border p-3">
-              <Avatar className="h-9 w-9">
-                <AvatarImage src={user?.avatar || undefined} />
-                <AvatarFallback>
-                  {user?.name?.charAt(0).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium">{user?.name}</p>
-                <Badge variant="secondary" className="text-[10px]">
-                  {user?.role}
-                </Badge>
+                  <LogOut className="h-4 w-4" />
+                </button>
               </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 shrink-0"
-                onClick={handleLogout}
-              >
-                <LogOut className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        </div>
-      </aside>
-    </>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+      <SidebarRail />
+    </Sidebar>
   );
 }

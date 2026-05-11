@@ -340,7 +340,7 @@ function UserView() {
   const { data: aiRecs, isLoading: aiLoading } = useQuery<JoinedEvent[]>({
     queryKey: ['ai-recommendations'],
     queryFn: async () => {
-      const res = await api.get('/ai/recommendations');
+      const res = await api.post('/ai/recommendations');
       return res.data.data?.events || [];
     },
   });
