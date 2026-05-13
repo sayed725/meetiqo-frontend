@@ -37,7 +37,7 @@ const navItems = [
   { label: 'Overview', href: '/dashboard', icon: LayoutDashboard, roles: ['USER', 'ORGANIZER', 'ADMIN'] },
   { label: 'My Events', href: '/dashboard/events', icon: CalendarDays, roles: ['ORGANIZER', 'ADMIN'] },
   { label: 'Invitations', href: '/dashboard/invitations', icon: Mail, roles: ['USER', 'ORGANIZER', 'ADMIN'] },
-  { label: 'AI Tools', href: '/dashboard/ai-tools', icon: Sparkles, roles: ['USER', 'ORGANIZER', 'ADMIN'] },
+  { label: 'AI Tools', href: '/dashboard/ai', icon: Sparkles, roles: ['USER', 'ORGANIZER', 'ADMIN'] },
   { label: 'Analytics', href: '/dashboard/analytics', icon: BarChart2, roles: ['ORGANIZER', 'ADMIN'] },
   { label: 'Profile', href: '/dashboard/profile', icon: User, roles: ['USER', 'ORGANIZER', 'ADMIN'] },
   { label: 'Settings', href: '/dashboard/settings', icon: Settings, roles: ['USER', 'ORGANIZER', 'ADMIN'] },

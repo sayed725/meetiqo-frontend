@@ -33,25 +33,12 @@ const navLinks = [
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
 
   const authNavLinks = user ? [...navLinks, { label: 'Dashboard', href: '/dashboard' }] : navLinks;
 
-  useEffect(() => {
-    if (dropdownOpen) {
-      document.body.style.overflow = 'hidden';
-      document.body.style.paddingRight = `${window.innerWidth - document.documentElement.clientWidth}px`;
-    } else {
-      document.body.style.overflow = '';
-      document.body.style.paddingRight = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-      document.body.style.paddingRight = '';
-    };
-  }, [dropdownOpen]);
+
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -88,7 +75,7 @@ export function Navbar() {
         <div className="hidden items-center gap-3 md:flex">
           <ModeToggle />
           {user ? (
-            <DropdownMenu onOpenChange={setDropdownOpen}>
+            <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="gap-2 rounded-full h-10 px-3 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
                   <Avatar className="h-8 w-8 border-2 border-slate-200 dark:border-slate-700">

@@ -12,6 +12,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { useAuthStore } from '@/lib/auth-store';
 
 const tools = [
   {
@@ -57,6 +58,12 @@ const tools = [
 ];
 
 export default function AIToolsHubPage() {
+  const { user } = useAuthStore();
+  
+  const filteredTools = tools.filter(tool => 
+    tool.badge === 'All Users' || ['ORGANIZER', 'ADMIN'].includes(user?.role || '')
+  );
+
   return (
     <div className="space-y-6">
       <div>
@@ -67,7 +74,7 @@ export default function AIToolsHubPage() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        {tools.map((tool) => {
+        {filteredTools.map((tool) => {
           const Icon = tool.icon;
           return (
             <Card
@@ -89,7 +96,7 @@ export default function AIToolsHubPage() {
                 <p className="text-sm text-muted-foreground">
                   {tool.description}
                 </p>
-                <Button asChild className="w-full">
+                <Button asChild className="w-full bg-purple-600 hover:bg-purple-700 text-white">
                   <Link href={`/dashboard/ai/${tool.id}`}>
                     Launch Tool
                     <ArrowRight className="ml-2 h-4 w-4" />

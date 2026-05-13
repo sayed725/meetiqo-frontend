@@ -106,11 +106,11 @@ export default function SettingsPage() {
 
       <Tabs defaultValue="profile" className="space-y-4">
         <TabsList className="grid w-full grid-cols-2 md:w-[400px]">
-          <TabsTrigger value="profile" className="flex items-center gap-2">
+          <TabsTrigger value="profile" className="flex items-center gap-2 data-[state=active]:bg-purple-600 data-[state=active]:text-white">
             <User className="h-4 w-4" />
             Profile
           </TabsTrigger>
-          <TabsTrigger value="security" className="flex items-center gap-2">
+          <TabsTrigger value="security" className="flex items-center gap-2 data-[state=active]:bg-purple-600 data-[state=active]:text-white">
             <Lock className="h-4 w-4" />
             Security
           </TabsTrigger>
@@ -173,7 +173,7 @@ export default function SettingsPage() {
                 </div>
               </CardContent>
               <CardFooter className="border-t px-6 py-4">
-                <Button type="submit" disabled={updateProfileMutation.isPending}>
+                <Button type="submit" disabled={updateProfileMutation.isPending} className="bg-purple-600 hover:bg-purple-700 text-white">
                   {updateProfileMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Save Changes
                 </Button>
@@ -269,7 +269,7 @@ export default function SettingsPage() {
                 </div>
               </CardContent>
               <CardFooter className="border-t px-6 py-4">
-                <Button type="submit" disabled={changePasswordMutation.isPending}>
+                <Button type="submit" disabled={changePasswordMutation.isPending} className="bg-purple-600 hover:bg-purple-700 text-white">
                   {changePasswordMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Update Password
                 </Button>

@@ -69,12 +69,18 @@
   html {
     scroll-behavior: smooth;
     scrollbar-gutter: stable;
+    overflow-y: scroll;
   }
   * {
     @apply border-border;
   }
   body {
     @apply bg-background text-foreground;
+  }
+  /* Prevent Radix UI from shifting content when opening dropdowns/modals */
+  body[data-scroll-locked], 
+  body[style*="overflow: hidden"] {
+    padding-right: 0 !important;
   }
 }
 

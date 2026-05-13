@@ -237,7 +237,7 @@ export default function DescriptionGeneratorPage() {
           <Button
             onClick={() => generateMutation.mutate()}
             disabled={!canGenerate || generateMutation.isPending}
-            className="w-full"
+            className="w-full bg-purple-600 hover:bg-purple-700 text-white"
           >
             {generateMutation.isPending ? (
               <>
@@ -274,7 +274,7 @@ export default function DescriptionGeneratorPage() {
                 )}
                 {copied ? 'Copied!' : 'Copy'}
               </Button>
-              <Button size="sm" asChild onClick={handleUseThis}>
+              <Button size="sm" asChild onClick={handleUseThis} className="bg-purple-600 hover:bg-purple-700 text-white">
                 <Link href="/dashboard/events">
                   Use This
                   <ArrowRight className="ml-2 h-3 w-3" />

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import {
@@ -72,8 +72,24 @@ export default function EventDetailClient({ event }: EventDetailClientProps) {
   const [saved, setSaved] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
 
+  const { data: userStatus } = useQuery({
+    queryKey: ['event-user-status', event.id],
+    queryFn: async () => {
+      const res = await api.get(`/events/${event.id}/user-status`);
+      return res.data.data;
+    },
+    enabled: isAuthenticated && !!event.id,
+  });
+
   const isOrganizer = user?.id === event.organizer?.id;
-  const isParticipant = event.myParticipation?.status === 'APPROVED';
+  const participationStatus = userStatus?.participation?.status || 'NONE';
+  const isParticipant = participationStatus === 'APPROVED';
+
+  useEffect(() => {
+    if (userStatus?.isSaved !== undefined) {
+      setSaved(userStatus.isSaved);
+    }
+  }, [userStatus?.isSaved]);
 
   const { data: reviewsData } = useQuery({
     queryKey: queryKeys.events.reviews(event.id),
@@ -631,7 +647,7 @@ export default function EventDetailClient({ event }: EventDetailClientProps) {
                   eventId={event.id}
                   type={event.type}
                   isOrganizer={isOrganizer}
-                  initialStatus={event.myParticipation?.status || 'NONE'}
+                  initialStatus={participationStatus}
                 />
 
                 {/* Actions */}
@@ -649,6 +665,7 @@ export default function EventDetailClient({ event }: EventDetailClientProps) {
                     className="flex-1 gap-2"
                     disabled={saveLoading}
                     onClick={async () => {
+                      if (!isAuthenticated) return;
                       const next = !saved;
                       setSaved(next);
                       setSaveLoading(true);

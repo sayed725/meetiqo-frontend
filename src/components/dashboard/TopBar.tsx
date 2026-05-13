@@ -27,8 +27,6 @@ interface TopBarProps {
 }
 
 export default function TopBar({ title }: TopBarProps) {
-  const [notifOpen, setNotifOpen] = useState(false);
-  const [userOpen, setUserOpen] = useState(false);
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
   const notifications = useNotificationsStore((s) => s.notifications);
@@ -36,19 +34,7 @@ export default function TopBar({ title }: TopBarProps) {
   const { handleMarkRead, handleMarkAllRead } = useNotifications();
   const pathname = usePathname();
 
-  useEffect(() => {
-    if (notifOpen || userOpen) {
-      document.body.style.overflow = 'hidden';
-      document.body.style.paddingRight = `${window.innerWidth - document.documentElement.clientWidth}px`;
-    } else {
-      document.body.style.overflow = '';
-      document.body.style.paddingRight = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-      document.body.style.paddingRight = '';
-    };
-  }, [notifOpen, userOpen]);
+
 
   const handleLogout = () => {
     logout();
@@ -95,7 +81,7 @@ export default function TopBar({ title }: TopBarProps) {
         {/* Theme Toggle */}
         <ModeToggle />
         {/* Notifications */}
-        <DropdownMenu onOpenChange={setNotifOpen}>
+        <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="relative">
               <Bell className="h-5 w-5" />
@@ -149,7 +135,7 @@ export default function TopBar({ title }: TopBarProps) {
         </DropdownMenu>
 
         {/* User menu */}
-        <DropdownMenu onOpenChange={setUserOpen}>
+        <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="gap-2">
               <Avatar className="h-8 w-8">

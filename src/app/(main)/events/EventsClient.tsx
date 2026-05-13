@@ -12,6 +12,7 @@ import {
   Users,
   Star,
   LayoutGrid,
+  ChevronDown,
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -19,12 +20,15 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { cn } from '@/lib/utils';
 import {
   Pagination,
   PaginationContent,
@@ -219,7 +223,7 @@ export default function EventsClient({
 
   const activeChips = getActiveChips({ ...filters, search: debouncedSearch });
 
-  const FilterContent = () => (
+  const filterContent = (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h3 className="font-semibold">Filters</h3>
@@ -249,108 +253,127 @@ export default function EventsClient({
 
       {/* Category */}
       <div className="space-y-2">
-        <label className="text-sm font-medium">Category</label>
-        <Select
-          value={filters.category}
-          onValueChange={(v) => updateFilter('category', v)}
-        >
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
+        <DropdownMenu modal={false}>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="w-full justify-between font-normal">
+              {filters.category === 'ALL' ? 'All Categories' : filters.category}
+              <ChevronDown className="h-4 w-4 opacity-50" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-[var(--radix-dropdown-menu-trigger-width)]" sideOffset={4}>
             {categories.map((c) => (
-              <SelectItem key={c} value={c}>
+              <DropdownMenuItem
+                key={c}
+                onClick={() => updateFilter('category', c)}
+                className={cn(filters.category === c && "bg-accent")}
+              >
                 {c === 'ALL' ? 'All Categories' : c}
-              </SelectItem>
+              </DropdownMenuItem>
             ))}
-          </SelectContent>
-        </Select>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       {/* Type */}
       <div className="space-y-2">
         <label className="text-sm font-medium">Type</label>
-        <Select
-          value={filters.type}
-          onValueChange={(v) => updateFilter('type', v)}
-        >
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
+        <DropdownMenu modal={false}>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="w-full justify-between font-normal">
+              {typeOptions.find(t => t.value === filters.type)?.label || 'All Types'}
+              <ChevronDown className="h-4 w-4 opacity-50" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-[var(--radix-dropdown-menu-trigger-width)]" sideOffset={4}>
             {typeOptions.map((t) => (
-              <SelectItem key={t.value} value={t.value}>
+              <DropdownMenuItem
+                key={t.value}
+                onClick={() => updateFilter('type', t.value)}
+                className={cn(filters.type === t.value && "bg-accent")}
+              >
                 {t.label}
-              </SelectItem>
+              </DropdownMenuItem>
             ))}
-          </SelectContent>
-        </Select>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       {/* Price */}
       <div className="space-y-2">
         <label className="text-sm font-medium">Price</label>
-        <Select
-          value={filters.price}
-          onValueChange={(v) => updateFilter('price', v)}
-        >
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
+        <DropdownMenu modal={false}>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="w-full justify-between font-normal">
+              {priceOptions.find(p => p.value === filters.price)?.label || 'All Prices'}
+              <ChevronDown className="h-4 w-4 opacity-50" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-[var(--radix-dropdown-menu-trigger-width)]" sideOffset={4}>
             {priceOptions.map((p) => (
-              <SelectItem key={p.value} value={p.value}>
+              <DropdownMenuItem
+                key={p.value}
+                onClick={() => updateFilter('price', p.value)}
+                className={cn(filters.price === p.value && "bg-accent")}
+              >
                 {p.label}
-              </SelectItem>
+              </DropdownMenuItem>
             ))}
-          </SelectContent>
-        </Select>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       {/* Date */}
       <div className="space-y-2">
         <label className="text-sm font-medium">Date</label>
-        <Select
-          value={filters.date}
-          onValueChange={(v) => updateFilter('date', v)}
-        >
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
+        <DropdownMenu modal={false}>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="w-full justify-between font-normal">
+              {dateOptions.find(d => d.value === filters.date)?.label || 'All Dates'}
+              <ChevronDown className="h-4 w-4 opacity-50" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-[var(--radix-dropdown-menu-trigger-width)]" sideOffset={4}>
             {dateOptions.map((d) => (
-              <SelectItem key={d.value} value={d.value}>
+              <DropdownMenuItem
+                key={d.value}
+                onClick={() => updateFilter('date', d.value)}
+                className={cn(filters.date === d.value && "bg-accent")}
+              >
                 {d.label}
-              </SelectItem>
+              </DropdownMenuItem>
             ))}
-          </SelectContent>
-        </Select>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       {/* Sort */}
       <div className="space-y-2">
         <label className="text-sm font-medium">Sort by</label>
-        <Select
-          value={filters.sort}
-          onValueChange={(v) => updateFilter('sort', v)}
-        >
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
+        <DropdownMenu modal={false}>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="w-full justify-between font-normal">
+              {sortOptions.find(s => s.value === filters.sort)?.label || 'Sort by'}
+              <ChevronDown className="h-4 w-4 opacity-50" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-[var(--radix-dropdown-menu-trigger-width)]" sideOffset={4}>
             {sortOptions.map((s) => (
-              <SelectItem key={s.value} value={s.value}>
+              <DropdownMenuItem
+                key={s.value}
+                onClick={() => updateFilter('sort', s.value)}
+                className={cn(filters.sort === s.value && "bg-accent")}
+              >
                 {s.label}
-              </SelectItem>
+              </DropdownMenuItem>
             ))}
-          </SelectContent>
-        </Select>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   );
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-7xl px-4 py-8">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold tracking-tight">Explore Events</h1>
@@ -359,11 +382,11 @@ export default function EventsClient({
         </p>
       </div>
 
-      <div className="flex gap-8">
+      <div className="flex gap-4">
         {/* Desktop Sidebar */}
         <aside className="hidden w-64 shrink-0 lg:block">
           <div className="sticky top-24">
-            <FilterContent />
+            {filterContent}
           </div>
         </aside>
 
@@ -380,26 +403,30 @@ export default function EventsClient({
               </SheetTrigger>
               <SheetContent side="left" className="w-80">
                 <div className="py-6">
-                  <FilterContent />
+                  {filterContent}
                 </div>
               </SheetContent>
             </Sheet>
 
-            <Select
-              value={filters.sort}
-              onValueChange={(v) => updateFilter('sort', v)}
-            >
-              <SelectTrigger className="w-[180px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
+            <DropdownMenu modal={false}>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="w-[180px] justify-between font-normal">
+                  {sortOptions.find(s => s.value === filters.sort)?.label || 'Sort by'}
+                  <ChevronDown className="h-4 w-4 opacity-50" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-[180px]" sideOffset={4}>
                 {sortOptions.map((s) => (
-                  <SelectItem key={s.value} value={s.value}>
+                  <DropdownMenuItem
+                    key={s.value}
+                    onClick={() => updateFilter('sort', s.value)}
+                    className={cn(filters.sort === s.value && "bg-accent")}
+                  >
                     {s.label}
-                  </SelectItem>
+                  </DropdownMenuItem>
                 ))}
-              </SelectContent>
-            </Select>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           {/* Active chips */}
@@ -450,7 +477,7 @@ export default function EventsClient({
 
           {/* Grid */}
           {isLoading ? (
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {Array.from({ length: 9 }).map((_, i) => (
                 <EventCardSkeleton key={i} />
               ))}
@@ -474,7 +501,7 @@ export default function EventsClient({
               </Button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {events.map((event: any) => (
                 <EventCard
                   key={event.id}

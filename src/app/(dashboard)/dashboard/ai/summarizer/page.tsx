@@ -108,7 +108,7 @@ export default function ReviewSummarizerPage() {
           <Button
             onClick={() => summarizeMutation.mutate()}
             disabled={!selectedEventId || summarizeMutation.isPending}
-            className="w-full"
+            className="w-full bg-purple-600 hover:bg-purple-700 text-white"
           >
             {summarizeMutation.isPending ? (
               <>

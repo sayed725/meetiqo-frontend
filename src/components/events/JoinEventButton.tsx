@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Check, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -23,6 +23,10 @@ export function JoinEventButton({
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const [status, setStatus] = useState<'NONE' | 'PENDING' | 'APPROVED'>(initialStatus);
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    setStatus(initialStatus);
+  }, [initialStatus]);
 
   if (isOrganizer) {
     return (
