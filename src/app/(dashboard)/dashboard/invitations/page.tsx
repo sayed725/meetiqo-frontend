@@ -132,13 +132,12 @@ export default function InvitationsPage() {
           {invitations.map((invitation) => (
             <Card key={invitation.id} className="flex flex-col relative overflow-hidden transition-all hover:shadow-md">
               {/* Status Indicator Line */}
-              <div 
-                className={`absolute top-0 left-0 w-1 h-full ${
-                  invitation.status === 'PENDING' ? 'bg-blue-500' :
-                  invitation.status === 'ACCEPTED' ? 'bg-green-500' : 'bg-red-500'
-                }`} 
+              <div
+                className={`absolute top-0 left-0 w-1 h-full ${invitation.status === 'PENDING' ? 'bg-blue-500' :
+                    invitation.status === 'ACCEPTED' ? 'bg-green-500' : 'bg-red-500'
+                  }`}
               />
-              
+
               <CardHeader className="flex flex-row items-start gap-4 pb-4">
                 <Avatar className="h-12 w-12 border">
                   <AvatarImage src={invitation.sender.avatar || undefined} alt={invitation.sender.name} />
@@ -147,10 +146,10 @@ export default function InvitationsPage() {
                 <div className="flex flex-col gap-1 flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2">
                     <span className="font-semibold text-base truncate">{invitation.sender.name}</span>
-                    <Badge 
+                    <Badge
                       variant={
                         invitation.status === 'PENDING' ? 'secondary' :
-                        invitation.status === 'ACCEPTED' ? 'default' : 'destructive'
+                          invitation.status === 'ACCEPTED' ? 'default' : 'destructive'
                       }
                       className="shrink-0"
                     >
@@ -162,7 +161,7 @@ export default function InvitationsPage() {
                   </span>
                 </div>
               </CardHeader>
-              
+
               <CardContent className="flex-1 space-y-4">
                 <div className="rounded-lg bg-muted/50 p-3 space-y-3">
                   <div className="font-medium truncate">{invitation.event.title}</div>
@@ -182,7 +181,7 @@ export default function InvitationsPage() {
 
                 {invitation.message && (
                   <div className="text-sm border-l-2 pl-3 py-1 text-muted-foreground italic">
-                    "{invitation.message}"
+                    &ldquo;{invitation.message}&rdquo;
                   </div>
                 )}
               </CardContent>
@@ -190,8 +189,8 @@ export default function InvitationsPage() {
               <CardFooter className="pt-4 border-t gap-3">
                 {invitation.status === 'PENDING' ? (
                   <>
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       className="flex-1"
                       disabled={respondMutation.isPending}
                       onClick={() => handleRespond(invitation.id, 'DECLINED')}
@@ -199,7 +198,7 @@ export default function InvitationsPage() {
                       <XCircle className="mr-2 h-4 w-4" />
                       Decline
                     </Button>
-                    <Button 
+                    <Button
                       className="flex-1"
                       disabled={respondMutation.isPending}
                       onClick={() => handleRespond(invitation.id, 'ACCEPTED')}

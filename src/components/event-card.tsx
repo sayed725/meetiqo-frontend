@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { Calendar, MapPin, Users } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -50,10 +51,13 @@ export function EventCard({ event, isLoading }: EventCardProps) {
       <Card className="group overflow-hidden transition-shadow hover:shadow-md">
         <div className="relative aspect-video bg-muted">
           {event.bannerImage ? (
-            <img
+            <Image
               src={event.bannerImage}
               alt={event.title}
-              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+              fill
+              priority
+              className="object-cover transition-transform duration-300 group-hover:scale-105"
+              sizes="(max-width: 768px) 100vw, 400px"
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-violet-100 to-blue-100 dark:from-violet-950 dark:to-blue-950">

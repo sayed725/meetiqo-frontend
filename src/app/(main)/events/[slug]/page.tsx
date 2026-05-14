@@ -2,34 +2,26 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import EventDetailClient from './EventDetailClient';
 
+// Force dynamic rendering — the backend API is external and not available at build time
+export const dynamic = 'force-dynamic';
+
 interface Props {
   params: { slug: string };
 }
 
-export async function generateStaticParams() {
+async function fetchEvent(slug: string) {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/events?limit=20`,
-      { next: { revalidate: 3600 } }
+      `${process.env.NEXT_PUBLIC_API_URL}/api/events/${slug}`,
+      { cache: 'no-store' }
     );
-    if (!res.ok) return [];
+    if (res.status === 404) return null;
+    if (!res.ok) return null;
     const json = await res.json();
-    const events = json.data?.events || [];
-    return events.map((event: any) => ({ slug: event.slug }));
+    return json.data;
   } catch {
-    return [];
+    return null;
   }
-}
-
-async function fetchEvent(slug: string) {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/events/${slug}`,
-    { next: { revalidate: 60 } }
-  );
-  if (res.status === 404) return null;
-  if (!res.ok) throw new Error(`API error ${res.status}`);
-  const json = await res.json();
-  return json.data;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -52,3 +44,4 @@ export default async function EventDetailPage({ params }: Props) {
 
   return <EventDetailClient event={event} />;
 }
+

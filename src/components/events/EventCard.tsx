@@ -39,17 +39,17 @@ const categoryGradients: Record<string, string> = {
   OTHER: 'from-slate-500/20 to-gray-500/20',
 };
 
-const categoryColors: Record<string, string> = {
-  TECH: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-  MUSIC: 'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400',
-  BUSINESS: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
-  HEALTH: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-  SPORTS: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
-  ART: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
-  EDUCATION: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400',
-  SOCIAL: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-  OTHER: 'bg-slate-100 text-slate-700 dark:bg-slate-900/30 dark:text-slate-400',
-};
+// const categoryColors: Record<string, string> = {
+//   TECH: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+//   MUSIC: 'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400',
+//   BUSINESS: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
+//   HEALTH: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+//   SPORTS: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
+//   ART: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
+//   EDUCATION: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400',
+//   SOCIAL: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+//   OTHER: 'bg-slate-100 text-slate-700 dark:bg-slate-900/30 dark:text-slate-400',
+// };
 
 function formatCategory(category: string): string {
   if (!category) return '';
@@ -106,6 +106,7 @@ export function EventCard({ event }: EventCardProps) {
               src={event.bannerImage}
               alt={event.title}
               fill
+              priority
               className="object-cover transition-transform duration-300 group-hover:scale-105"
               sizes="320px"
             />
@@ -142,52 +143,54 @@ export function EventCard({ event }: EventCardProps) {
           </div>
         </div>
 
-        <CardContent className="flex-1 flex flex-col space-y-3 p-4">
-          {/* Category chip */}
-          <div>
-            <Badge 
-              variant="secondary" 
-              className={cn(
-                "text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full",
-                categoryColors[event.category] || categoryColors.OTHER
-              )}
-            >
-              {formatCategory(event.category)}
-            </Badge>
-          </div>
+        <CardContent className="flex-1 flex flex-col p-4">
+          <div className="flex flex-col space-y-3 flex-1">
+            {/* Category chip */}
+            <div>
+              <Badge
+                variant="secondary"
+                className={cn(
+                  "text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full",
+                 
+                )}
+              >
+                {formatCategory(event.category)}
+              </Badge>
+            </div>
 
-          {/* Title */}
-          <h3 className="line-clamp-2 text-base font-medium leading-snug group-hover:text-primary">
-            {event.title}
-          </h3>
+            {/* Title */}
+            <h3 className="line-clamp-2 text-base font-medium leading-snug group-hover:text-primary">
+              {event.title}
+            </h3>
 
-          {/* Organizer */}
-          <div className="flex items-center gap-2">
-            <Avatar className="h-6 w-6">
-              <AvatarImage src={event.organizer.avatar || undefined} />
-              <AvatarFallback className="text-[10px]">
-                {event.organizer.name.charAt(0).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-            <span className="text-xs text-muted-foreground">
-              {event.organizer.name}
-            </span>
-          </div>
+            {/* Organizer */}
+            <div className="flex items-center gap-2">
+              <Avatar className="h-6 w-6">
+                <AvatarImage src={event.organizer.avatar || undefined} />
+                <AvatarFallback className="text-[10px]">
+                  {event.organizer.name.charAt(0).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <span className="text-xs text-muted-foreground">
+                {event.organizer.name}
+              </span>
+            </div>
 
-          {/* Date */}
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <Calendar className="h-3.5 w-3.5 shrink-0" />
-            <span>{formatEventDate(event.startDate)}</span>
-          </div>
+            {/* Date */}
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <Calendar className="h-3.5 w-3.5 shrink-0" />
+              <span>{formatEventDate(event.startDate)}</span>
+            </div>
 
-          {/* Location */}
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <MapPin className="h-3.5 w-3.5 shrink-0" />
-            <span className="truncate">{event.location}</span>
+            {/* Location */}
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <MapPin className="h-3.5 w-3.5 shrink-0" />
+              <span className="truncate">{event.location}</span>
+            </div>
           </div>
 
           {/* Bottom row */}
-          <div className="flex items-center justify-between pt-1 mt-auto">
+          <div className="flex items-center justify-between pt-3 mt-3 border-t border-border/50">
             <div className="flex items-center gap-3">
               {event.averageRating != null && event.averageRating > 0 && (
                 <StarRating rating={event.averageRating} />
@@ -197,9 +200,9 @@ export function EventCard({ event }: EventCardProps) {
                 <span>{event.participantCount}</span>
               </div>
             </div>
-            <Button variant="ghost" size="sm" className="h-7 text-xs font-medium">
+            <span className="text-xs font-medium text-primary group-hover:underline">
               View Details
-            </Button>
+            </span>
           </div>
         </CardContent>
       </Card>
@@ -211,23 +214,25 @@ export function EventCardSkeleton() {
   return (
     <div className="w-full h-full max-w-[380px] min-w-[300px] shrink-0">
       <Card className="w-full h-full max-w-[380px] overflow-hidden flex flex-col">
-      <Skeleton className="h-[160px] w-full" />
-      <CardContent className="flex-1 flex flex-col space-y-3 p-4">
-        <Skeleton className="h-5 w-16" />
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-3/4" />
-        <div className="flex items-center gap-2">
-          <Skeleton className="h-6 w-6 rounded-full" />
-          <Skeleton className="h-3 w-24" />
-        </div>
-        <Skeleton className="h-3 w-full" />
-        <Skeleton className="h-3 w-2/3" />
-        <div className="flex items-center justify-between pt-1 mt-auto">
-          <Skeleton className="h-3 w-20" />
-          <Skeleton className="h-7 w-24" />
-        </div>
-      </CardContent>
-    </Card>
+        <Skeleton className="h-[160px] w-full" />
+        <CardContent className="flex-1 flex flex-col p-4">
+          <div className="flex flex-col space-y-3 flex-1">
+            <Skeleton className="h-5 w-16" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-3/4" />
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-6 w-6 rounded-full" />
+              <Skeleton className="h-3 w-24" />
+            </div>
+            <Skeleton className="h-3 w-full" />
+            <Skeleton className="h-3 w-2/3" />
+          </div>
+          <div className="flex items-center justify-between pt-3 mt-3 border-t border-border/50">
+            <Skeleton className="h-3 w-20" />
+            <Skeleton className="h-7 w-24" />
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

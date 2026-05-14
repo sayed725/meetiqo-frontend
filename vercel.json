@@ -5,11 +5,6 @@
   "installCommand": "npm install",
   "framework": "nextjs",
   "regions": ["iad1"],
-  "env": {
-    "NEXT_PUBLIC_API_URL": "@meetiqo_api_url",
-    "NEXT_PUBLIC_APP_URL": "@meetiqo_app_url",
-    "NEXT_PUBLIC_GOOGLE_CLIENT_ID": "@meetiqo_google_client_id"
-  },
   "headers": [
     {
       "source": "/(.*)",
@@ -27,12 +22,6 @@
           "value": "1; mode=block"
         }
       ]
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/api/:path*",
-      "destination": "${NEXT_PUBLIC_API_URL}/api/:path*"
     }
   ]
 }

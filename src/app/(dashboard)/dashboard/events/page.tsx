@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -246,7 +247,7 @@ export default function MyEventsPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 ">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">My Events</h1>
@@ -499,9 +500,11 @@ export default function MyEventsPage() {
                       <TableRow key={event.id}>
                         <TableCell>
                           {event.bannerImage ? (
-                            <img
+                            <Image
                               src={event.bannerImage}
                               alt={event.title}
+                              width={64}
+                              height={40}
                               className="h-10 w-16 rounded object-cover"
                             />
                           ) : (

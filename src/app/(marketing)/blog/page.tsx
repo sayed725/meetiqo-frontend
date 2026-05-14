@@ -34,11 +34,41 @@ const posts = [
     date: 'Jan 20, 2025',
     gradient: 'from-emerald-500/20 to-teal-500/20',
   },
+  {
+    slug: 'successful-hybrid-events',
+    title: 'The Future of Hybrid Events: Bridging the Gap',
+    excerpt:
+      'Explore the best tools and techniques for hosting hybrid events that keep both in-person and remote attendees fully engaged.',
+    category: 'Technology',
+    readTime: '7 min read',
+    date: 'Dec 12, 2024',
+    gradient: 'from-indigo-500/20 to-blue-500/20',
+  },
+  {
+    slug: 'maximizing-event-sponsorships',
+    title: 'How to Attract Sponsors for Your Local Meetups',
+    excerpt:
+      'A step-by-step guide to creating compelling sponsorship packages and pitching to companies that align with your community values.',
+    category: 'Business',
+    readTime: '10 min read',
+    date: 'Nov 05, 2024',
+    gradient: 'from-orange-500/20 to-amber-500/20',
+  },
+  {
+    slug: 'post-event-engagement',
+    title: 'Strategies for Post-Event Community Engagement',
+    excerpt:
+      'The event is over, but the networking shouldn\'t stop. Learn how to keep the momentum going and build a self-sustaining community.',
+    category: 'Community',
+    readTime: '6 min read',
+    date: 'Oct 22, 2024',
+    gradient: 'from-red-500/20 to-rose-500/20',
+  },
 ];
 
 export default function BlogPage() {
   return (
-    <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-7xl min-h-screen px-4 py-16 sm:px-6 lg:px-8">
       <div className="text-center">
         <h1 className="text-3xl font-bold sm:text-4xl">Blog</h1>
         <p className="mt-3 text-muted-foreground">
@@ -46,7 +76,7 @@ export default function BlogPage() {
         </p>
       </div>
 
-      <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-12 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {posts.map((post) => (
           <Card
             key={post.slug}
