@@ -1,6 +1,11 @@
+'use client';
+
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Calendar, MapPin, Users, ArrowRight, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useAuthStore } from '@/lib/auth-store';
+import { toast } from 'sonner';
 
 function MockEventCard({
   title,
@@ -40,6 +45,23 @@ function MockEventCard({
 }
 
 export function HeroSection() {
+  const router = useRouter();
+  const user = useAuthStore((s) => s.user);
+
+  const handleCreateEvent = () => {
+    if (!user) {
+      toast.error('Please login to create an event');
+      return;
+    }
+
+    if (user.role !== 'ORGANIZER') {
+      toast.error('Be a organizer to create event');
+      return;
+    }
+
+    router.push('/events/create');
+  };
+
   return (
     <section className="relative flex min-h-[70vh] items-center overflow-hidden pt-16">
       {/* Gradient blob */}
@@ -74,17 +96,20 @@ export function HeroSection() {
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center lg:justify-start">
             <Link href="/events">
-              <Button size="lg" className="w-full gap-2 sm:w-auto">
+              <Button size="lg" className="w-full gap-2 sm:w-auto bg-purple-600 text-white hover:bg-purple-700 hover:text-white">
                 Explore Events
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
-            <Link href="/events/create">
-              <Button size="lg" variant="outline" className="w-full gap-2 sm:w-auto">
-                <Plus className="h-4 w-4" />
-                Create Event
-              </Button>
-            </Link>
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className="w-full gap-2 sm:w-auto"
+              onClick={handleCreateEvent}
+            >
+              <Plus className="h-4 w-4" />
+              Create Event
+            </Button>
           </div>
         </div>
 

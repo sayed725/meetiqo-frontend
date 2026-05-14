@@ -26,16 +26,17 @@ interface EventCardProps {
     };
   };
   isLoading?: boolean;
+  priority?: boolean;
 }
 
-export function EventCard({ event, isLoading }: EventCardProps) {
+export function EventCard({ event, isLoading, priority }: EventCardProps) {
   if (isLoading || !event) {
     return (
-      <Card className="overflow-hidden">
-        <Skeleton className="aspect-video w-full" />
-        <CardContent className="p-4">
-          <Skeleton className="mb-2 h-5 w-3/4" />
-          <Skeleton className="mb-2 h-4 w-1/2" />
+      <Card className="h-full overflow-hidden">
+        <Skeleton className="aspect-video w-full shrink-0" />
+        <CardContent className="p-4 flex flex-col gap-2">
+          <Skeleton className="h-5 w-3/4" />
+          <Skeleton className="h-4 w-1/2" />
           <Skeleton className="h-4 w-1/3" />
         </CardContent>
       </Card>
@@ -47,15 +48,15 @@ export function EventCard({ event, isLoading }: EventCardProps) {
   const day = date.getDate();
 
   return (
-    <Link href={`/events/${event.slug}`}>
-      <Card className="group overflow-hidden transition-shadow hover:shadow-md">
-        <div className="relative aspect-video bg-muted">
+    <Link href={`/events/${event.slug}`} className="block h-full">
+      <Card className="group flex h-full flex-col overflow-hidden transition-shadow hover:shadow-md">
+        <div className="relative aspect-video bg-muted shrink-0">
           {event.bannerImage ? (
             <Image
               src={event.bannerImage}
               alt={event.title}
               fill
-              priority
+              priority={priority}
               className="object-cover transition-transform duration-300 group-hover:scale-105"
               sizes="(max-width: 768px) 100vw, 400px"
             />
@@ -76,20 +77,22 @@ export function EventCard({ event, isLoading }: EventCardProps) {
             </Badge>
           </div>
         </div>
-        <CardContent className="p-4">
-          <Badge variant="outline" className="mb-2 text-xs">
-            {event.category}
-          </Badge>
-          <h3 className="mb-2 line-clamp-2 font-semibold leading-tight group-hover:text-primary">
+        <CardContent className="flex flex-1 flex-col p-4">
+          <div className="mb-2">
+            <Badge variant="outline" className="text-xs">
+              {event.category}
+            </Badge>
+          </div>
+          <h3 className="mb-2 line-clamp-2 min-h-[2.5rem] font-semibold leading-tight group-hover:text-primary">
             {event.title}
           </h3>
-          <div className="flex items-center gap-3 text-sm text-muted-foreground">
+          <div className="mb-auto flex items-center gap-3 text-sm text-muted-foreground">
             <div className="flex items-center gap-1">
               <MapPin className="h-3.5 w-3.5" />
               <span className="truncate">{event.location}</span>
             </div>
           </div>
-          <div className="mt-3 flex items-center justify-between">
+          <div className="mt-4 flex items-center justify-between border-t border-border/50 pt-4">
             <div className="flex items-center gap-2">
               <Avatar className="h-6 w-6">
                 <AvatarImage src={event.organizer?.avatar || undefined} />

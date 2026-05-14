@@ -79,9 +79,15 @@ export default function LoginPage() {
     }
   };
 
-  const fillDemo = () => {
-    form.setValue('email', 'admin@meetiqo.com');
-    form.setValue('password', 'demo123');
+  const fillDemo = (role: keyof typeof demoCredentials) => {
+    form.setValue('email', demoCredentials[role].email);
+    form.setValue('password', demoCredentials[role].password);
+  };
+
+  const demoCredentials = {
+    admin: { email: 'admin@meetiqo.com', password: 'demo123' },
+    organizer: { email: 'organizer@meetiqo.com', password: 'demo123' },
+    user: { email: 'user@meetiqo.com', password: 'demo123' },
   };
 
   return (
@@ -136,7 +142,7 @@ export default function LoginPage() {
             )}
           />
 
-          <Button type="submit" className="w-full" disabled={isLoading}>
+          <Button type="submit" className="w-full bg-purple-600 text-white hover:bg-purple-700 hover:text-white" disabled={isLoading}>
             {isLoading ? 'Signing in...' : 'Sign in'}
           </Button>
         </form>
@@ -151,15 +157,32 @@ export default function LoginPage() {
       <div className="space-y-3">
         <GoogleSignInButton onSuccess={handleGoogleSuccess} />
 
-        <Button
-          type="button"
-          variant="outline"
-          className="w-full gap-2"
-          onClick={fillDemo}
-        >
-          <Sparkles className="h-4 w-4" />
-          Demo login
-        </Button>
+        <div className="grid grid-cols-3 gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            className="h-9 px-2 text-[10px] sm:text-xs"
+            onClick={() => fillDemo('admin')}
+          >
+            Admin Demo
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            className="h-9 px-2 text-[10px] sm:text-xs"
+            onClick={() => fillDemo('organizer')}
+          >
+            Org Demo
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            className="h-9 px-2 text-[10px] sm:text-xs"
+            onClick={() => fillDemo('user')}
+          >
+            User Demo
+          </Button>
+        </div>
       </div>
 
       <p className="mt-6 text-center text-sm text-muted-foreground">

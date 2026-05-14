@@ -44,7 +44,7 @@ export default function TopBar({ title }: TopBarProps) {
   const pathSegments = pathname.split('/').filter(Boolean);
 
   return (
-    <header className="flex h-16 items-center justify-between border-b bg-background px-4 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center justify-between border-b bg-background/80 px-4 backdrop-blur-md transition-all sm:px-6 lg:px-8">
       {/* Page title / Breadcrumbs */}
       <div className="flex items-center gap-2">
         <SidebarTrigger className="-ml-2 md:hidden" />
@@ -77,7 +77,7 @@ export default function TopBar({ title }: TopBarProps) {
       </div>
 
       {/* Right side */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-1 lg:gap-4">
         {/* Theme Toggle */}
         <ModeToggle />
         {/* Notifications */}
