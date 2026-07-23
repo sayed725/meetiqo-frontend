@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
   LineChart,
@@ -59,8 +59,13 @@ interface AnalyticsMetrics {
 }
 
 export default function AnalyticsPage() {
+  const [mounted, setMounted] = useState(false);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const { data: participantsData } = useQuery<ParticipantsOverTime[]>({
     queryKey: queryKeys.analytics.participants({ start: startDate, end: endDate }),
@@ -172,14 +177,14 @@ export default function AnalyticsPage() {
       {/* Charts */}
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Participants Over Time */}
-        <Card>
+        <Card className="min-w-0">
           <CardHeader>
             <CardTitle className="text-base">Participants Over Time</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-[300px]">
-              {participantsData && participantsData.length > 0 ? (
-                <ResponsiveContainer width="100%" height="100%">
+            <div className="h-[300px] w-full">
+              {mounted && participantsData && participantsData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                   <LineChart data={participantsData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                     <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" />
@@ -205,14 +210,14 @@ export default function AnalyticsPage() {
         </Card>
 
         {/* Events by Category */}
-        <Card>
+        <Card className="min-w-0">
           <CardHeader>
             <CardTitle className="text-base">Events by Category</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-[300px]">
-              {categoryData && categoryData.length > 0 ? (
-                <ResponsiveContainer width="100%" height="100%">
+            <div className="h-[300px] w-full">
+              {mounted && categoryData && categoryData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                   <BarChart data={categoryData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                     <XAxis dataKey="category" stroke="hsl(var(--muted-foreground))" />

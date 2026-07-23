@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
@@ -20,6 +21,9 @@ import {
   X,
   Bookmark,
   CalendarDays,
+  MapPin,
+  Calendar,
+  LayoutDashboard,
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -33,6 +37,13 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 import { useAuthStore } from '@/lib/auth-store';
 import { queryKeys } from '@/lib/query-keys';
 import api from '@/lib/api';
@@ -60,6 +71,8 @@ interface RecentEvent {
   participants: number;
   maxParticipants: number | null;
   status: string;
+  location?: string;
+  price?: number;
 }
 
 const statusColorMap: Record<string, string> = {
@@ -98,6 +111,9 @@ const statConfig = [
 ];
 
 function OrganizerView() {
+  const [selectedEvent, setSelectedEvent] = useState<RecentEvent | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
   const { data: stats } = useQuery<DashboardStats>({
     queryKey: queryKeys.dashboard.stats,
     queryFn: async () => {
@@ -113,6 +129,11 @@ function OrganizerView() {
       return res.data.data?.events || [];
     },
   });
+
+  const handleShowDetails = (event: RecentEvent) => {
+    setSelectedEvent(event);
+    setIsDialogOpen(true);
+  };
 
   return (
     <div className="space-y-6">
@@ -146,9 +167,8 @@ function OrganizerView() {
                 </div>
                 <p className="flex items-center text-xs text-muted-foreground">
                   <TrendIcon
-                    className={`mr-1 h-3 w-3 ${
-                      isPositive ? 'text-green-600' : 'text-red-600'
-                    }`}
+                    className={`mr-1 h-3 w-3 ${isPositive ? 'text-green-600' : 'text-red-600'
+                      }`}
                   />
                   <span
                     className={isPositive ? 'text-green-600' : 'text-red-600'}
@@ -165,7 +185,7 @@ function OrganizerView() {
 
       {/* Quick Actions */}
       <div className="flex flex-wrap gap-3">
-        <Button asChild>
+        <Button asChild className='bg-purple-600 text-white hover:bg-purple-700 hover:text-white'>
           <Link href="/dashboard/events">
             <Plus className="mr-2 h-4 w-4" />
             Create New Event
@@ -230,33 +250,106 @@ function OrganizerView() {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
-                      <Button variant="ghost" size="icon" asChild>
-                        <Link href={`/dashboard/events/${event.id}`}>
-                          <Eye className="h-4 w-4" />
-                        </Link>
-                      </Button>
-                      <Button variant="ghost" size="icon" asChild>
-                        <Link href={`/dashboard/events/${event.id}/edit`}>
-                          <Edit3 className="h-4 w-4" />
-                        </Link>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleShowDetails(event)}
+                      >
+                        <Eye className="h-4 w-4" />
                       </Button>
                     </div>
                   </TableCell>
                 </TableRow>
               )) ?? (
-                <TableRow>
-                  <TableCell
-                    colSpan={5}
-                    className="text-center text-muted-foreground"
-                  >
-                    Loading...
-                  </TableCell>
-                </TableRow>
-              )}
+                  <TableRow>
+                    <TableCell
+                      colSpan={5}
+                      className="text-center text-muted-foreground"
+                    >
+                      Loading...
+                    </TableCell>
+                  </TableRow>
+                )}
             </TableBody>
           </Table>
         </CardContent>
       </Card>
+
+      {/* Event Details Dialog */}
+      {isDialogOpen && (
+        <div 
+          className="fixed inset-0 z-40 bg-black/40 backdrop-blur-[2px] transition-all"
+          onClick={() => setIsDialogOpen(false)}
+        />
+      )}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen} modal={false}>
+        <DialogContent className="max-w-md z-50">
+          <DialogHeader>
+            <DialogTitle>{selectedEvent?.title}</DialogTitle>
+            <DialogDescription>
+              Detailed information about your event.
+            </DialogDescription>
+          </DialogHeader>
+          {selectedEvent && (
+            <div className="space-y-4 pt-4">
+              <div className="flex items-center gap-3 text-sm">
+                <Calendar className="h-4 w-4 text-muted-foreground" />
+                <span>
+                  {new Date(selectedEvent.startDate).toLocaleDateString(
+                    'en-US',
+                    {
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    }
+                  )}
+                </span>
+              </div>
+              {selectedEvent.location && (
+                <div className="flex items-center gap-3 text-sm">
+                  <MapPin className="h-4 w-4 text-muted-foreground" />
+                  <span>{selectedEvent.location}</span>
+                </div>
+              )}
+              <div className="flex items-center gap-3 text-sm">
+                <Users className="h-4 w-4 text-muted-foreground" />
+                <span>
+                  {selectedEvent.participants}
+                  {selectedEvent.maxParticipants
+                    ? ` / ${selectedEvent.maxParticipants}`
+                    : ''}{' '}
+                  Participants
+                </span>
+              </div>
+              {selectedEvent.price !== undefined && (
+                <div className="flex items-center gap-3 text-sm">
+                  <DollarSign className="h-4 w-4 text-muted-foreground" />
+                  <span>
+                    {selectedEvent.price === 0
+                      ? 'Free'
+                      : `$${selectedEvent.price}`}
+                  </span>
+                </div>
+              )}
+              <div className="flex items-center gap-3 text-sm">
+                <LayoutDashboard className="h-4 w-4 text-muted-foreground" />
+                <Badge
+                  variant="secondary"
+                  className={statusColorMap[selectedEvent.status]}
+                >
+                  {selectedEvent.status}
+                </Badge>
+              </div>
+              <div className="pt-4 flex justify-end">
+                <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                  Close
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -95,7 +95,7 @@ export default function LoginPage() {
       <ToastContainer toasts={toasts} onDismiss={dismiss} />
 
       <div className="mb-8 text-center lg:text-left">
-        <h1 className="text-2xl font-bold tracking-tight">Welcome back</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Welcome back!</h1>
         <p className="text-muted-foreground">Sign in to your Meetiqo account</p>
       </div>
 

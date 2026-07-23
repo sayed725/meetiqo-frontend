@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { toast } from 'sonner';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -116,6 +117,8 @@ export default function MyEventsPage() {
   const [open, setOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('PUBLISHED');
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
+  const [selectedEventForView, setSelectedEventForView] = useState<DashboardEvent | null>(null);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const queryClient = useQueryClient();
 
   const {
@@ -217,6 +220,7 @@ export default function MyEventsPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['my-events'] });
+      toast.success('Event deleted successfully');
     },
   });
 
@@ -246,6 +250,11 @@ export default function MyEventsPage() {
     return event.isPaid ? count * event.price : 0;
   };
 
+  const handleViewDetails = (event: DashboardEvent) => {
+    setSelectedEventForView(event);
+    setIsDetailsOpen(true);
+  };
+
   return (
     <div className="space-y-6 ">
       <div className="flex items-center justify-between">
@@ -255,14 +264,22 @@ export default function MyEventsPage() {
             Manage and track all your events.
           </p>
         </div>
-        <Dialog open={open} onOpenChange={handleOpenChange}>
+        
+        {/* Create/Edit Modal with manual backdrop */}
+        {open && (
+          <div 
+            className="fixed inset-0 z-40 bg-black/40 backdrop-blur-[2px] transition-all"
+            onClick={() => handleOpenChange(false)}
+          />
+        )}
+        <Dialog open={open} onOpenChange={handleOpenChange} modal={false}>
           <DialogTrigger asChild>
-            <Button>
+            <Button className='bg-purple-600 text-white hover:bg-purple-700 hover:text-white'>
               <Plus className="mr-2 h-4 w-4" />
               Create Event
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto z-50">
             <DialogHeader>
               <DialogTitle>{editingEventId ? 'Edit Event' : 'Create New Event'}</DialogTitle>
               <DialogDescription>
@@ -431,7 +448,7 @@ export default function MyEventsPage() {
                 )}
               </div>
 
-              <div className="flex justify-end gap-2">
+              <div className="flex justify-end gap-2 pt-4">
                 <Button
                   type="button"
                   variant="outline"
@@ -439,7 +456,7 @@ export default function MyEventsPage() {
                 >
                   Cancel
                 </Button>
-                <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending}>
+                <Button type="submit" className='bg-purple-600 text-white hover:bg-purple-700 hover:text-white' disabled={createMutation.isPending || updateMutation.isPending}>
                   {createMutation.isPending || updateMutation.isPending
                     ? (editingEventId ? 'Updating...' : 'Creating...')
                     : (editingEventId ? 'Update Event' : 'Create Event')}
@@ -450,8 +467,95 @@ export default function MyEventsPage() {
         </Dialog>
       </div>
 
+      {/* Details Modal with manual backdrop */}
+      {isDetailsOpen && (
+        <div 
+          className="fixed inset-0 z-40 bg-black/40 backdrop-blur-[2px] transition-all"
+          onClick={() => setIsDetailsOpen(false)}
+        />
+      )}
+      <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen} modal={false}>
+        <DialogContent className="max-w-md z-50">
+          <DialogHeader>
+            <DialogTitle>{selectedEventForView?.title}</DialogTitle>
+            <DialogDescription>
+              Detailed information about your event.
+            </DialogDescription>
+          </DialogHeader>
+          {selectedEventForView && (
+            <div className="space-y-4 pt-4">
+              {selectedEventForView.bannerImage && (
+                <div className="relative h-40 w-full overflow-hidden rounded-md">
+                  <Image
+                    src={selectedEventForView.bannerImage}
+                    alt={selectedEventForView.title}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              )}
+              <div className="flex items-center gap-3 text-sm">
+                <Calendar className="h-4 w-4 text-muted-foreground" />
+                <span>
+                  {new Date(selectedEventForView.startDate).toLocaleDateString(
+                    'en-US',
+                    {
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    }
+                  )}
+                </span>
+              </div>
+              {selectedEventForView.location && (
+                <div className="flex items-center gap-3 text-sm">
+                  <MapPin className="h-4 w-4 text-muted-foreground" />
+                  <span>{selectedEventForView.location}</span>
+                </div>
+              )}
+              <div className="flex items-center gap-3 text-sm">
+                <Users className="h-4 w-4 text-muted-foreground" />
+                <span>
+                  {selectedEventForView._count?.participations || 0}
+                  {selectedEventForView.maxParticipants
+                    ? ` / ${selectedEventForView.maxParticipants}`
+                    : ''}{' '}
+                  Participants
+                </span>
+              </div>
+              <div className="flex items-center gap-3 text-sm">
+                <DollarSign className="h-4 w-4 text-muted-foreground" />
+                <span>
+                  {selectedEventForView.price === 0
+                    ? 'Free'
+                    : `$${selectedEventForView.price}`}
+                </span>
+              </div>
+              <div className="pt-2">
+                <p className="text-sm text-muted-foreground line-clamp-4">
+                  {selectedEventForView.description}
+                </p>
+              </div>
+              <div className="pt-4 flex justify-end gap-2">
+                <Button variant="outline" asChild>
+                   <Link href={`/events/${selectedEventForView.slug}`} target="_blank">
+                     Public Page
+                   </Link>
+                </Button>
+                <Button className='bg-purple-600 text-white hover:bg-purple-700 hover:text-white' onClick={() => setIsDetailsOpen(false)}>
+                  Close
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList>
+        <TabsList className='bg-muted/50'>
           <TabsTrigger value="PUBLISHED">Published</TabsTrigger>
           <TabsTrigger value="DRAFT">Draft</TabsTrigger>
           <TabsTrigger value="COMPLETED">Completed</TabsTrigger>
@@ -558,19 +662,17 @@ export default function MyEventsPage() {
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
-                            <Button variant="ghost" size="icon" asChild>
-                              <Link href={`/events/${event.slug}`}>
-                                <Eye className="h-4 w-4" />
-                              </Link>
+                            <Button variant="ghost" size="icon" onClick={() => handleViewDetails(event)}>
+                              <Eye className="h-4 w-4 text-purple-600" />
                             </Button>
                             <Button variant="ghost" size="icon" onClick={() => handleEdit(event)}>
-                              <Edit3 className="h-4 w-4" />
+                              <Edit3 className="h-4 w-4 text-blue-600" />
                             </Button>
                             <Button variant="ghost" size="icon" asChild>
                               <Link
                                 href={`/dashboard/events/${event.id}/participants`}
                               >
-                                <Users className="h-4 w-4" />
+                                <Users className="h-4 w-4 text-green-600" />
                               </Link>
                             </Button>
                             <Button
@@ -579,9 +681,17 @@ export default function MyEventsPage() {
                               className="text-destructive hover:bg-destructive/10"
                               disabled={deleteMutation.isPending}
                               onClick={() => {
-                                if (confirm('Are you sure you want to delete this event? This action cannot be undone.')) {
-                                  deleteMutation.mutate(event.id);
-                                }
+                                toast.error('Delete Event?', {
+                                  description: 'Are you sure you want to delete this event? This action cannot be undone.',
+                                  action: {
+                                    label: 'Delete',
+                                    onClick: () => deleteMutation.mutate(event.id),
+                                  },
+                                  cancel: {
+                                    label: 'Cancel',
+                                    onClick: () => {},
+                                  },
+                                });
                               }}
                             >
                               <Trash2 className="h-4 w-4" />

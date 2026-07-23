@@ -131,7 +131,7 @@ export default function RegisterPage() {
 
       <div className="mb-8 text-center lg:text-left">
         <h1 className="text-2xl font-bold tracking-tight">Create an account</h1>
-        <p className="text-muted-foreground">Get started with Meetiqo today</p>
+        <p className="text-muted-foreground">Get started with Meetiqo</p>
       </div>
 
       <Form {...form}>
